@@ -47,9 +47,9 @@ function App() {
 
                 <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
                     <a href="#modules" onClick={() => setIsMenuOpen(false)}>Workbench</a>
-                    <a href="#research" onClick={() => setIsMenuOpen(false)}>Research</a>
+                    {/* <a href="#research" onClick={() => setIsMenuOpen(false)}>Research</a> */}
                     <div className="action-buttons">
-                        <a href="#access" className="btn-login" onClick={() => setIsMenuOpen(false)}>Lab Access</a>
+                        {/* <a href="#access" className="btn-login" onClick={() => setIsMenuOpen(false)}>Lab Access</a> */}
                         <a href="https://www.koneacademy.io/" className="btn-hub" onClick={() => setIsMenuOpen(false)}>Back to Hub</a>
                     </div>
                 </div>
