@@ -69,7 +69,7 @@ function App() {
 
             {/* Modules Grid */}
             <section id="modules" className="modules-section">
-                <h2 className="section-title">ENGINEERING TRACKS</h2>
+                <h2 className="section-title">Engineering Tracks</h2>
                 <div className="grid">
                     {modules.map(mod => (
                         <div key={mod.id} className="glass-card">
