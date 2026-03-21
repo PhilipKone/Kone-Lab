@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kone-lab-cache-v2';
+const CACHE_NAME = 'kone-lab-cache-v3';
 const urlsToCache = [
   './',
   './index.html',
