@@ -1,7 +1,6 @@
 const CACHE_NAME = 'kone-lab-cache-v5';
 const urlsToCache = [
   './',
-  './index.html',
   './logo-circle-blue.svg'
 ];
 
