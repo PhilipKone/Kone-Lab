@@ -19,6 +19,12 @@
       "url": "/#/workshop",
       "description": "Quickly access the engineering workshop",
       "icons": [{ "src": "logo-circle-blue.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Documentation",
+      "url": "https://consult.koneacademy.io/#/docs?category=lab",
+      "description": "View Lab hardware documentation",
+      "icons": [{ "src": "logo-circle-blue.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
   ]
 }
