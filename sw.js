@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kone-lab-cache-v6';
+const CACHE_NAME = 'kone-lab-cache-v7';
 const urlsToCache = [
   './',
   './logo-circle-blue.svg'
@@ -24,8 +24,18 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
+    fetch(event.request)
+      .then(response => {
+        // If it's a static asset, cache it
+        if (urlsToCache.some(u => event.request.url.includes(u.replace('./', '')))) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request)) // Fallback to cache if offline
   );
 });
