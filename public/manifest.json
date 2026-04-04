@@ -1,0 +1,30 @@
+{
+  "short_name": "Kone Lab",
+  "name": "Kone Lab",
+  "icons": [
+    {
+      "src": "logo-circle-blue.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1e1e1e",
+  "background_color": "#0d1117",
+  "shortcuts": [
+    {
+      "name": "Enter Workshop",
+      "url": "/#/workshop",
+      "description": "Quickly access the engineering workshop",
+      "icons": [{ "src": "logo-circle-blue.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Documentation",
+      "url": "https://consult.koneacademy.io/#/docs?category=lab",
+      "description": "View Lab hardware documentation",
+      "icons": [{ "src": "logo-circle-blue.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}

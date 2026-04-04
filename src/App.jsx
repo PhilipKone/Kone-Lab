@@ -1,43 +1,134 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
-import { FaBars, FaTimes, FaCogs, FaMicrochip, FaCube, FaTools, FaGithub } from 'react-icons/fa';
+import { FaBars, FaTimes, FaCogs, FaMicrochip, FaCube, FaTools, FaGithub, FaDiscord, FaLinkedin, FaFacebook, FaInstagram, FaSlack, FaYoutube, FaTiktok } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
+import WorkshopLayout from './components/WorkshopLayout';
+import AuthInterceptModal from './components/AuthInterceptModal';
+import LoadingScreen from './components/LoadingScreen';
+import { useAuth } from './context/AuthContext';
+import { useEffect } from 'react';
+import LabHero3D from './components/LabHero3D';
 
 function App() {
+    const [isInitializing, setIsInitializing] = useState(true);
+    const { currentUser, loading } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [showConstruction, setShowConstruction] = useState(false);
+    const [isWorkshopOpen, setIsWorkshopOpen] = useState(false);
+    const [showAuthModal, setShowAuthModal] = useState(false);
 
-    const modules = [
-        {
-            id: 'robotics',
-            title: 'Robotics & Automation',
-            level: 'Physical Engineering',
-            icon: <FaCogs />,
-            desc: 'Arduino, precision motor control, and sensor integration.',
-            status: 'Active'
-        },
-        {
-            id: '3d-design',
-            title: '3D Prototyping',
-            level: 'CAD & Fabrication',
-            icon: <FaCube />,
-            desc: 'Fusion 360 mastery and advanced additive manufacturing.',
-            status: 'Open'
-        },
-        {
-            id: 'embedded',
-            title: 'Embedded Systems',
-            level: 'Circuit Design',
-            icon: <FaMicrochip />,
-            desc: 'PCB design, soldering, and low-level firmware coding.',
-            status: 'Waitlist'
+    // Initial check on mount
+    useEffect(() => {
+        if (!loading) {
+            const isGuest = sessionStorage.getItem('kone_lab_guest') === 'true';
+            const wasWorkshopActive = sessionStorage.getItem('kone_workshop_active') === 'true';
+            const isWorkshopHash = window.location.hash === '#/workshop' || window.location.hash.includes('workshop');
+
+            if (wasWorkshopActive || isWorkshopHash) {
+                if (currentUser || isGuest) {
+                    // Restore workshop state if active during refresh or hash present
+                    setIsWorkshopOpen(true);
+                } else if (isWorkshopHash) {
+                    // If user is trying to enter via shortcut but not logged in, show auth
+                    setShowAuthModal(true);
+                } else if (wasWorkshopActive) {
+                    // Proactive prompt on refresh if trying to restore without identity
+                    setShowAuthModal(true);
+                }
+            }
         }
-    ];
+    }, [currentUser, loading]);
+
+    const handleEnterWorkshop = () => {
+        const isGuest = sessionStorage.getItem('kone_lab_guest') === 'true';
+        if (!currentUser && !isGuest) {
+            setShowAuthModal(true);
+        } else {
+            sessionStorage.setItem('kone_workshop_active', 'true');
+            setIsWorkshopOpen(true);
+        }
+    };
+
+    const handleContinueAsGuest = () => {
+        sessionStorage.setItem('kone_lab_guest', 'true');
+        setShowAuthModal(false);
+        sessionStorage.setItem('kone_workshop_active', 'true');
+        setIsWorkshopOpen(true);
+    };
+
+    const handleCloseWorkshop = () => {
+        sessionStorage.removeItem('kone_workshop_active');
+        setIsWorkshopOpen(false);
+    };
 
     return (
         <div className="app-container">
+            <LoadingScreen onFinished={() => setIsInitializing(false)} />
+
+            {!isInitializing && (
+                <AnimatePresence>
+                    {loading ? (
+                        <div className="loading-overlay" style={{
+                            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                            background: '#0a0a0b', display: 'flex', alignItems: 'center',
+                            justifyContent: 'center', zIndex: 3000
+                        }}>
+                            {/* Option A: Native-like shimmer placeholders while auth loads */}
+                            <div className="container" style={{ padding: '2rem', width: '100%' }}>
+                                <div className="row g-4">
+                                    {[1, 2, 3, 4, 5, 6].map(i => (
+                                        <div key={i} className="col-12 col-md-4">
+                                            <div style={{ height: '200px', background: 'rgba(255,255,255,0.03)', borderRadius: '20px', overflow: 'hidden', position: 'relative' }} className="shimmer-box" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            {isWorkshopOpen && (
+                                <WorkshopLayout onClose={handleCloseWorkshop} />
+                            )}
+                            <AuthInterceptModal
+                                isOpen={showAuthModal}
+                                onClose={() => setShowAuthModal(false)}
+                                onContinueAsGuest={handleContinueAsGuest}
+                            />
+                        </>
+                    )}
+                    {showConstruction && (
+                        <div className="modal-overlay" onClick={() => setShowConstruction(false)} style={{
+                            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                            background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center',
+                            justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(8px)'
+                        }}>
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                onClick={e => e.stopPropagation()}
+                                className="glass-card"
+                                style={{ maxWidth: '400px', width: '90%', padding: '2.5rem', textAlign: 'center', border: '1px solid #eab308' }}
+                            >
+                                <div style={{ color: '#eab308', fontSize: '3rem', marginBottom: '1rem' }}><FaTools /></div>
+                                <h2 style={{ color: 'white' }}>Under Development</h2>
+                                <p style={{ color: 'rgba(255,255,255,0.7)', margin: '1rem 0 2rem' }}>
+                                    The <strong>Kone Lab Workshop</strong> is currently being built. <br />
+                                    We are engineering a state-of-the-art virtual lab and prototyping space.
+                                </p>
+                                <button className="btn-primary" onClick={() => setShowConstruction(false)} style={{ background: '#eab308', color: '#000', border: 'none' }}>
+                                    Got it
+                                </button>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+            )}
             {/* Navigation */}
             <nav className="navbar">
                 <div className="logo">
-                    <img src="/logo-circle-blue.svg" alt="Logo" style={{ height: '24px', marginRight: '10px', verticalAlign: 'middle' }} />
+                    <img src="/logo-circle-blue.svg" alt="Logo" style={{ height: '35px', marginRight: '10px', verticalAlign: 'middle' }} />
                     Kone Lab
                 </div>
 
@@ -46,10 +137,9 @@ function App() {
                 </div>
 
                 <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-                    <a href="#modules" onClick={() => setIsMenuOpen(false)}>Workbench</a>
-                    {/* <a href="#research" onClick={() => setIsMenuOpen(false)}>Research</a> */}
+                    <a href="https://consult.koneacademy.io/#/docs?category=lab" target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)}>Docs</a>
                     <div className="action-buttons">
-                        {/* <a href="#access" className="btn-login" onClick={() => setIsMenuOpen(false)}>Lab Access</a> */}
+                        <a href="https://consult.koneacademy.io/#/login" className="btn-login" onClick={() => setIsMenuOpen(false)}>Login</a>
                         <a href="https://www.koneacademy.io/" className="btn-hub" onClick={() => setIsMenuOpen(false)}>Back to Hub</a>
                     </div>
                 </div>
@@ -57,43 +147,73 @@ function App() {
 
             {/* Hero Section */}
             <header className="hero">
-                <div className="hero-content">
-                    <h1 className="hero-title">BUILD THE <br /> <span className="text-gradient">PHYSICAL WORLD</span></h1>
-                    <p className="hero-subtitle">
-                        Advanced engineering & hardware prototyping division.<br />
-                        <span className="text-white">Engineer the future the right way.</span>
-                    </p>
-                    <button className="btn-primary">ENTER WORKSHOP</button>
+                <div className="hero-container">
+                    <div className="hero-text-side">
+                        <motion.h1 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                            className="hero-title"
+                        >
+                            BUILD THE <br /> <span className="text-gradient">PHYSICAL WORLD</span>
+                        </motion.h1>
+                        <motion.p 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="hero-subtitle"
+                        >
+                            Advanced engineering & hardware prototyping division.<br />
+                            <span className="text-white">Engineer the future the right way.</span>
+                        </motion.p>
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.4 }}
+                            className="hero-ctas"
+                            style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}
+                        >
+                            <button className="btn btn-primary btn-large" onClick={handleEnterWorkshop}>
+                                ENTER WORKSHOP
+                            </button>
+                            <a 
+                                href="https://consult.koneacademy.io/#/training?category=lab" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="btn btn-secondary-outline btn-large"
+                                style={{ 
+                                    textDecoration: 'none', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center' 
+                                }}
+                            >
+                                TRAINING HUB
+                            </a>
+                        </motion.div>
+                    </div>
+                    <div className="hero-animation">
+                        <LabHero3D />
+                    </div>
                 </div>
             </header>
 
-            {/* Modules Grid */}
-            <section id="modules" className="modules-section">
-                <h2 className="section-title">Engineering Tracks</h2>
-                <div className="grid">
-                    {modules.map(mod => (
-                        <div key={mod.id} className="glass-card">
-                            <div className="card-header">
-                                <span className="icon">{mod.icon}</span>
-                                <span className={`status ${mod.status.toLowerCase()}`}>{mod.status}</span>
-                            </div>
-                            <h3>{mod.title}</h3>
-                            <p className="level">{mod.level}</p>
-                            <p className="description">{mod.desc}</p>
-                            <button className="btn-card">Initialize Project &rarr;</button>
-                        </div>
-                    ))}
-                </div>
-            </section>
+            {/* Modules Grid - REMOVED (Migrated to Training Hub) */}
 
             {/* Footer */}
             <footer className="footer">
-                <p>&copy; 2025 Kone Lab Division. All Rights Reserved.</p>
+                <p>&copy; {new Date().getFullYear()} Kone Lab Division. All Rights Reserved.</p>
                 <p className="footer-sub">Hardware Engineering Branch of Kone Academy</p>
-                <div style={{ marginTop: '0.5rem', fontSize: '1.2rem' }}>
-                    <a href="https://github.com/PhilipKone/Kone-Lab.git" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
-                        <FaGithub /> GitHub
-                    </a>
+                <div className="social-icons" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
+                    <a href="https://x.com/koneacademy" target="_blank" rel="noreferrer" aria-label="X"><FaXTwitter /></a>
+                    <a href="https://www.tiktok.com/@koneacademy?_r=1&_t=ZM-931L3z5lu71" target="_blank" rel="noreferrer" aria-label="TikTok"><FaTiktok /></a>
+                    <a href="https://github.com/PhilipKone/Kone-Lab.git" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><FaGithub /></a>
+                    <a href="https://discord.gg/Ab4SCxPgUK" target="_blank" rel="noreferrer" aria-label="Discord"><FaDiscord /></a>
+                    <a href="https://www.linkedin.com/company/konecodeacdemy/?viewAsMember=true" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
+                    <a href="https://www.facebook.com/profile.php?id=61584327765846" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebook /></a>
+                    <a href="https://www.instagram.com/koneacademy?igsh=bnlnaTZ5YmNsMXJ1&utm_source=qr" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
+                    <a href="https://join.slack.com/t/koneacademy/shared_invite/zt-3te5lrqpj-d3gixasFIoSerlBnoQ1UMg" target="_blank" rel="noreferrer" aria-label="Slack"><FaSlack /></a>
+                    <a href="https://youtube.com/@koneacademy?si=zqEGBiiu0NRdNk6p" target="_blank" rel="noreferrer" aria-label="YouTube"><FaYoutube /></a>
                 </div>
             </footer>
         </div>
