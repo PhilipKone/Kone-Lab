@@ -6,6 +6,7 @@ import { FaXTwitter } from 'react-icons/fa6';
 import WorkshopLayout from './components/WorkshopLayout';
 import AuthInterceptModal from './components/AuthInterceptModal';
 import LoadingScreen from './components/LoadingScreen';
+import InstallBanner from './components/InstallBanner';
 import { useAuth } from './context/AuthContext';
 import { useEffect } from 'react';
 import LabHero3D from './components/LabHero3D';
@@ -216,6 +217,7 @@ function App() {
                     <a href="https://youtube.com/@koneacademy?si=zqEGBiiu0NRdNk6p" target="_blank" rel="noreferrer" aria-label="YouTube"><FaYoutube /></a>
                 </div>
             </footer>
+            <InstallBanner />
         </div>
     );
 }
