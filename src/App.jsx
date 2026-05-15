@@ -10,6 +10,7 @@ import InstallBanner from './components/InstallBanner';
 import { useAuth } from './context/AuthContext';
 import { useEffect } from 'react';
 import LabHero3D from './components/LabHero3D';
+import AnimStudio from './components/AnimStudio';
 
 function App() {
     const [isInitializing, setIsInitializing] = useState(true);
@@ -17,28 +18,39 @@ function App() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showConstruction, setShowConstruction] = useState(false);
     const [isWorkshopOpen, setIsWorkshopOpen] = useState(false);
+    const [isAnimStudioOpen, setIsAnimStudioOpen] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
 
     // Initial check on mount
     useEffect(() => {
-        if (!loading) {
-            const isGuest = sessionStorage.getItem('kone_lab_guest') === 'true';
-            const wasWorkshopActive = sessionStorage.getItem('kone_workshop_active') === 'true';
-            const isWorkshopHash = window.location.hash === '#/workshop' || window.location.hash.includes('workshop');
+        const handleHashChange = () => {
+            const hash = window.location.hash;
+            const isWorkshopHash = hash === '#/workshop' || hash.includes('workshop');
+            const isAnimStudioHash = hash === '#/anim-studio' || hash.includes('anim-studio');
 
-            if (wasWorkshopActive || isWorkshopHash) {
-                if (currentUser || isGuest) {
-                    // Restore workshop state if active during refresh or hash present
-                    setIsWorkshopOpen(true);
-                } else if (isWorkshopHash) {
-                    // If user is trying to enter via shortcut but not logged in, show auth
-                    setShowAuthModal(true);
-                } else if (wasWorkshopActive) {
-                    // Proactive prompt on refresh if trying to restore without identity
-                    setShowAuthModal(true);
+            if (isWorkshopHash) {
+                if (!loading) {
+                    const isGuest = sessionStorage.getItem('kone_lab_guest') === 'true';
+                    if (currentUser || isGuest) {
+                        setIsWorkshopOpen(true);
+                        setIsAnimStudioOpen(false);
+                    } else {
+                        setShowAuthModal(true);
+                    }
                 }
+            } else if (isAnimStudioHash) {
+                setIsAnimStudioOpen(true);
+                setIsWorkshopOpen(false);
+            } else {
+                setIsWorkshopOpen(false);
+                setIsAnimStudioOpen(false);
             }
-        }
+        };
+
+        window.addEventListener('hashchange', handleHashChange);
+        handleHashChange(); // Initial check
+
+        return () => window.removeEventListener('hashchange', handleHashChange);
     }, [currentUser, loading]);
 
     const handleEnterWorkshop = () => {
@@ -47,7 +59,7 @@ function App() {
             setShowAuthModal(true);
         } else {
             sessionStorage.setItem('kone_workshop_active', 'true');
-            setIsWorkshopOpen(true);
+            window.location.hash = '#/workshop';
         }
     };
 
@@ -55,13 +67,21 @@ function App() {
         sessionStorage.setItem('kone_lab_guest', 'true');
         setShowAuthModal(false);
         sessionStorage.setItem('kone_workshop_active', 'true');
-        setIsWorkshopOpen(true);
+        window.location.hash = '#/workshop';
     };
 
     const handleCloseWorkshop = () => {
         sessionStorage.removeItem('kone_workshop_active');
-        setIsWorkshopOpen(false);
+        window.location.hash = '#/';
     };
+
+    const handleCloseAnimStudio = () => {
+        window.location.hash = '#/';
+    };
+
+    if (isAnimStudioOpen) {
+        return <AnimStudio onBack={handleCloseAnimStudio} />;
+    }
 
     return (
         <div className="app-container">
@@ -75,7 +95,6 @@ function App() {
                             background: '#0a0a0b', display: 'flex', alignItems: 'center',
                             justifyContent: 'center', zIndex: 3000
                         }}>
-                            {/* Option A: Native-like shimmer placeholders while auth loads */}
                             <div className="container" style={{ padding: '2rem', width: '100%' }}>
                                 <div className="row g-4">
                                     {[1, 2, 3, 4, 5, 6].map(i => (
@@ -139,6 +158,7 @@ function App() {
 
                 <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
                     <a href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/docs?category=lab"} target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)}>Docs</a>
+                    <a href="#/anim-studio" onClick={() => setIsMenuOpen(false)}>Anim Studio</a>
                     <div className="action-buttons">
                         <a href={window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001/login' : 'https://consult.koneacademy.io/login'} className="btn-login" onClick={() => setIsMenuOpen(false)}>Login</a>
                         <a href={window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:5173/' : 'https://www.koneacademy.io/'} className="btn-hub" onClick={() => setIsMenuOpen(false)}>Back to Hub</a>
@@ -199,8 +219,6 @@ function App() {
                 </div>
             </header>
 
-            {/* Modules Grid - REMOVED (Migrated to Training Hub) */}
-
             {/* Footer */}
             <footer className="footer">
                 <p>&copy; {new Date().getFullYear()} Kone Lab Division. All Rights Reserved.</p>
@@ -208,7 +226,6 @@ function App() {
                 <div className="social-icons" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
                     <a href="https://x.com/koneacademy" target="_blank" rel="noreferrer" aria-label="X"><FaXTwitter /></a>
                     <a href="https://www.tiktok.com/@koneacademy?_r=1&_t=ZM-931L3z5lu71" target="_blank" rel="noreferrer" aria-label="TikTok"><FaTiktok /></a>
-                    <a href="https://github.com/PhilipKone/Kone-Lab.git" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><FaGithub /></a>
                     <a href="https://discord.gg/Ab4SCxPgUK" target="_blank" rel="noreferrer" aria-label="Discord"><FaDiscord /></a>
                     <a href="https://www.linkedin.com/company/konecodeacdemy/?viewAsMember=true" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
                     <a href="https://www.facebook.com/profile.php?id=61584327765846" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebook /></a>
