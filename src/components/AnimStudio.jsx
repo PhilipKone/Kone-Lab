@@ -202,7 +202,7 @@ const AnimStudio = ({ onBack }) => {
                     </div>
                     <div className="guide-footer">
                         <a 
-                            href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/docs?category=lab&topic=anim-studio"}
+                            href={((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/docs?category=lab&topic=anim-studio"}
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="btn-docs"

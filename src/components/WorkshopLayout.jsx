@@ -258,7 +258,7 @@ const WorkshopLayout = ({ onClose }) => {
                                     <div className="popover-header">Workshop Help</div>
                                     <div className="popover-content">
                                         <a 
-                                            href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/docs?category=lab"} 
+                                            href={((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/docs?category=lab"} 
                                             target="_blank" 
                                             rel="noopener noreferrer"
                                             className="popover-item"
@@ -272,7 +272,7 @@ const WorkshopLayout = ({ onClose }) => {
                                         </a>
 
                                         <a 
-                                            href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/contact"} 
+                                            href={((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/contact"} 
                                             target="_blank" 
                                             rel="noopener noreferrer"
                                             className="popover-item"

@@ -157,11 +157,11 @@ function App() {
                 </div>
 
                 <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-                    <a href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/docs?category=lab"} target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)}>Docs</a>
+                    <a href={((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/docs?category=lab"} target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)}>Docs</a>
                     <a href="#/anim-studio" onClick={() => setIsMenuOpen(false)}>Anim Studio</a>
                     <div className="action-buttons">
-                        <a href={window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001/login' : 'https://consult.koneacademy.io/login'} className="btn-login" onClick={() => setIsMenuOpen(false)}>Login</a>
-                        <a href={window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:5173/' : 'https://www.koneacademy.io/'} className="btn-hub" onClick={() => setIsMenuOpen(false)}>Back to Hub</a>
+                        <a href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001/login' : 'https://consult.koneacademy.io/login'} className="btn-login" onClick={() => setIsMenuOpen(false)}>Login</a>
+                        <a href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:5173/' : 'https://www.koneacademy.io/'} className="btn-hub" onClick={() => setIsMenuOpen(false)}>Back to Hub</a>
                     </div>
                 </div>
             </nav>
@@ -198,7 +198,7 @@ function App() {
                                 ENTER WORKSHOP
                             </button>
                             <a 
-                                href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/training?category=lab"}
+                                href={((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/training?category=lab"}
                                 target="_blank" 
                                 rel="noopener noreferrer" 
                                 className="btn btn-secondary-outline btn-large"

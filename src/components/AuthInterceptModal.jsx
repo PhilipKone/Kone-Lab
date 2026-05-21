@@ -60,7 +60,7 @@ const AuthInterceptModal = ({ isOpen, onClose, onContinueAsGuest }) => {
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <a
-                                href={window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001/login' : 'https://consult.koneacademy.io/login'}
+                                href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001/login' : 'https://consult.koneacademy.io/login'}
                                 style={{
                                     textDecoration: 'none',
                                     display: 'flex',

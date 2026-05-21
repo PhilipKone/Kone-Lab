@@ -156,6 +156,11 @@ const LabHero3D = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const isReactSnap = navigator.userAgent === 'ReactSnap' || navigator.userAgent.includes('ReactSnap');
+    if (isReactSnap) {
+        return <div style={{ minHeight: isMobile ? '350px' : '550px' }} />;
+    }
+
     return (
         <div style={{
             width: '100%', height: '100%', minHeight: isMobile ? '350px' : '550px',
