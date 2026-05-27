@@ -140,16 +140,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
+            {children}
             {!loading && (
-                <>
-                    {children}
-                    <SessionWarningModal 
-                        isOpen={showSessionWarning}
-                        onStay={resetInactivityTimer}
-                        onLogout={logout}
-                        timeoutSeconds={WARNING_BEFORE_MS / 1000}
-                    />
-                </>
+                <SessionWarningModal 
+                    isOpen={showSessionWarning}
+                    onStay={resetInactivityTimer}
+                    onLogout={logout}
+                    timeoutSeconds={WARNING_BEFORE_MS / 1000}
+                />
             )}
         </AuthContext.Provider>
     );

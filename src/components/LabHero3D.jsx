@@ -5,7 +5,7 @@ import { Float, Environment, PerspectiveCamera, ContactShadows, PresentationCont
 const GlassMaterial = ({ color = "#ffffff", opacity = 0.5, transmission = 1.0, thickness = 2 }) => (
     <meshPhysicalMaterial
         color={color}
-        transmission={transmission}
+        transmission={0}
         thickness={thickness}
         roughness={0.1}
         metalness={0.1}

@@ -39,8 +39,9 @@ function App() {
     useEffect(() => {
         const handleHashChange = () => {
             const hash = window.location.hash;
-            const isWorkshopHash = hash === '#/workshop' || hash.includes('workshop');
-            const isAnimStudioHash = hash === '#/anim-studio' || hash.includes('anim-studio');
+            const pathname = window.location.pathname;
+            const isWorkshopHash = hash === '#/workshop' || hash.includes('workshop') || pathname.includes('workshop');
+            const isAnimStudioHash = hash === '#/anim-studio' || hash.includes('anim-studio') || pathname.includes('anim-studio');
 
             if (isWorkshopHash) {
                 if (!loading) {
