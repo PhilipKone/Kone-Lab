@@ -13,8 +13,14 @@ import LabHero3D from './components/LabHero3D';
 import AnimStudio from './components/AnimStudio';
 
 function App() {
-    const [isInitializing, setIsInitializing] = useState(false);
-    const [showLoader, setShowLoader] = useState(false);
+    // Synchronous state initialization to prevent first-render flashing
+    const [isInitializing, setIsInitializing] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        const isSnap = navigator.userAgent.includes('ReactSnap');
+        const hasLoaded = sessionStorage.getItem('kone_lab_loaded') === 'true';
+        return !isSnap && !hasLoaded;
+    });
+    const [showLoader, setShowLoader] = useState(isInitializing);
     const { currentUser, loading } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showConstruction, setShowConstruction] = useState(false);
@@ -22,12 +28,9 @@ function App() {
     const [isAnimStudioOpen, setIsAnimStudioOpen] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
 
-    // Dynamic loader activation to prevent hydration mismatch in SSG
+    // Save session loaded state on mount
     useEffect(() => {
-        const isSnap = navigator.userAgent.includes('ReactSnap');
-        if (!isSnap && !sessionStorage.getItem('kone_lab_loaded')) {
-            setShowLoader(true);
-            setIsInitializing(true);
+        if (typeof window !== 'undefined') {
             sessionStorage.setItem('kone_lab_loaded', 'true');
         }
     }, []);
