@@ -14,7 +14,7 @@ interface FirebaseConfig {
 }
 
 const firebaseConfig: FirebaseConfig = {
-    apiKey: (import.meta.env.VITE_FIREBASE_API_KEY || 'dummy_key') as string,
+    apiKey: (import.meta.env.VITE_FIREBASE_API_KEY || '') as string,
     authDomain: (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'dummy_domain') as string,
     projectId: (import.meta.env.VITE_FIREBASE_PROJECT_ID || 'dummy_project') as string,
     storageBucket: (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'dummy_bucket') as string,
@@ -29,15 +29,15 @@ let db: Firestore;
 let analytics: Analytics | undefined;
 
 try {
-    if (firebaseConfig.apiKey === 'dummy_key') {
+    if (!firebaseConfig.apiKey) {
         console.warn('Firebase Hub: Missing VITE_FIREBASE_API_KEY. Initializing in offline simulation mode.');
     }
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
     
-    // Only initialize analytics if running in a browser environment
-    if (typeof window !== 'undefined') {
+    // Only initialize analytics if running in a browser environment and not prerendering
+    if (typeof window !== 'undefined' && window.navigator.userAgent !== 'ReactSnap') {
         analytics = getAnalytics(app);
     }
 } catch (error) {

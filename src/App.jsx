@@ -13,13 +13,24 @@ import LabHero3D from './components/LabHero3D';
 import AnimStudio from './components/AnimStudio';
 
 function App() {
-    const [isInitializing, setIsInitializing] = useState(true);
+    const [isInitializing, setIsInitializing] = useState(false);
+    const [showLoader, setShowLoader] = useState(false);
     const { currentUser, loading } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showConstruction, setShowConstruction] = useState(false);
     const [isWorkshopOpen, setIsWorkshopOpen] = useState(false);
     const [isAnimStudioOpen, setIsAnimStudioOpen] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
+
+    // Dynamic loader activation to prevent hydration mismatch in SSG
+    useEffect(() => {
+        const isSnap = navigator.userAgent.includes('ReactSnap');
+        if (!isSnap && !sessionStorage.getItem('kone_lab_loaded')) {
+            setShowLoader(true);
+            setIsInitializing(true);
+            sessionStorage.setItem('kone_lab_loaded', 'true');
+        }
+    }, []);
 
     // Initial check on mount
     useEffect(() => {
@@ -85,16 +96,28 @@ function App() {
 
     return (
         <div className="app-container">
-            <LoadingScreen onFinished={() => setIsInitializing(false)} />
+            {showLoader && (
+                <LoadingScreen onFinished={() => {
+                    setShowLoader(false);
+                    setIsInitializing(false);
+                }} />
+            )}
 
             {!isInitializing && (
-                <AnimatePresence>
+                <AnimatePresence mode="wait">
                     {loading ? (
-                        <div className="loading-overlay" style={{
-                            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                            background: '#0a0a0b', display: 'flex', alignItems: 'center',
-                            justifyContent: 'center', zIndex: 3000
-                        }}>
+                        <motion.div
+                            key="loading"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="loading-overlay"
+                            style={{
+                                position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                                background: '#0a0a0b', display: 'flex', alignItems: 'center',
+                                justifyContent: 'center', zIndex: 3000
+                            }}
+                        >
                             <div className="container" style={{ padding: '2rem', width: '100%' }}>
                                 <div className="row g-4">
                                     {[1, 2, 3, 4, 5, 6].map(i => (
@@ -104,19 +127,119 @@ function App() {
                                     ))}
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
+                    ) : isWorkshopOpen ? (
+                        <WorkshopLayout key="workshop" onClose={handleCloseWorkshop} />
                     ) : (
-                        <>
-                            {isWorkshopOpen && (
-                                <WorkshopLayout onClose={handleCloseWorkshop} />
-                            )}
-                            <AuthInterceptModal
-                                isOpen={showAuthModal}
-                                onClose={() => setShowAuthModal(false)}
-                                onContinueAsGuest={handleContinueAsGuest}
-                            />
-                        </>
+                        <motion.div
+                            key="landing"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            style={{ width: '100%', display: 'flex', flexDirection: 'column' }}
+                        >
+                            {/* Navigation */}
+                            <nav className="navbar">
+                                <div className="logo">
+                                    <img src="/logo-circle-blue.svg" alt="Logo" style={{ height: '35px', marginRight: '10px', verticalAlign: 'middle' }} />
+                                    Kone Lab
+                                </div>
+
+                                <div className="mobile-menu-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                                    {isMenuOpen ? <FaTimes /> : <FaBars />}
+                                </div>
+
+                                <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
+                                    <a href={((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/docs?category=lab"} target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)}>Docs</a>
+                                    <a href="#/anim-studio" onClick={() => setIsMenuOpen(false)}>Anim Studio</a>
+                                    <div className="action-buttons">
+                                        <a href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001/login' : 'https://consult.koneacademy.io/login'} className="btn-login" onClick={() => setIsMenuOpen(false)}>Login</a>
+                                        <a href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:5173/' : 'https://www.koneacademy.io/'} className="btn-hub" onClick={() => setIsMenuOpen(false)}>Back to Hub</a>
+                                    </div>
+                                </div>
+                            </nav>
+
+                            {/* Hero Section */}
+                            <header className="hero">
+                                <div className="hero-container">
+                                    <div className="hero-text-side">
+                                        <motion.h1 
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.6 }}
+                                            className="hero-title"
+                                        >
+                                            BUILD THE <br /> <span className="text-gradient">PHYSICAL WORLD</span>
+                                        </motion.h1>
+                                        <motion.p 
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.6, delay: 0.2 }}
+                                            className="hero-subtitle"
+                                        >
+                                            Advanced engineering & hardware prototyping division.<br />
+                                            <span className="text-white">Engineer the future the right way.</span>
+                                        </motion.p>
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.6, delay: 0.4 }}
+                                            className="hero-ctas"
+                                            style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}
+                                        >
+                                            <button className="btn btn-primary btn-large" onClick={handleEnterWorkshop}>
+                                                ENTER WORKSHOP
+                                            </button>
+                                            <a 
+                                                href={((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/training?category=lab"}
+                                                target="_blank" 
+                                                rel="noopener noreferrer" 
+                                                className="btn btn-secondary-outline btn-large"
+                                                style={{ 
+                                                    textDecoration: 'none', 
+                                                    display: 'flex', 
+                                                    alignItems: 'center', 
+                                                    justifyContent: 'center' 
+                                                }}
+                                            >
+                                                TRAINING HUB
+                                            </a>
+                                        </motion.div>
+                                    </div>
+                                    <div className="hero-animation">
+                                        <LabHero3D />
+                                    </div>
+                                </div>
+                            </header>
+
+                            {/* Footer */}
+                            <footer className="footer">
+                                <p>&copy; {new Date().getFullYear()} Kone Lab Division. All Rights Reserved.</p>
+                                <p className="footer-sub">Hardware Engineering Branch of Kone Academy</p>
+                                <div className="social-icons" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
+                                    <a href="https://x.com/koneacademy" target="_blank" rel="noreferrer" aria-label="X"><FaXTwitter /></a>
+                                    <a href="https://www.tiktok.com/@koneacademy?_r=1&_t=ZM-931L3z5lu71" target="_blank" rel="noreferrer" aria-label="TikTok"><FaTiktok /></a>
+                                    <a href="https://discord.gg/Ab4SCxPgUK" target="_blank" rel="noreferrer" aria-label="Discord"><FaDiscord /></a>
+                                    <a href="https://www.linkedin.com/company/konecodeacdemy/?viewAsMember=true" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
+                                    <a href="https://www.facebook.com/profile.php?id=61584327765846" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebook /></a>
+                                    <a href="https://www.instagram.com/koneacademy?igsh=bnlnaTZ5YmNsMXJ1&utm_source=qr" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
+                                    <a href="https://join.slack.com/t/koneacademy/shared_invite/zt-3te5lrqpj-d3gixasFIoSerlBnoQ1UMg" target="_blank" rel="noreferrer" aria-label="Slack"><FaSlack /></a>
+                                    <a href="https://youtube.com/@koneacademy?si=zqEGBiiu0NRdNk6p" target="_blank" rel="noreferrer" aria-label="YouTube"><FaYoutube /></a>
+                                </div>
+                            </footer>
+                            <InstallBanner />
+                        </motion.div>
                     )}
+                </AnimatePresence>
+            )}
+
+            {!isInitializing && (
+                <>
+                    <AuthInterceptModal
+                        isOpen={showAuthModal}
+                        onClose={() => setShowAuthModal(false)}
+                        onContinueAsGuest={handleContinueAsGuest}
+                    />
                     {showConstruction && (
                         <div className="modal-overlay" onClick={() => setShowConstruction(false)} style={{
                             position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -143,98 +266,8 @@ function App() {
                             </motion.div>
                         </div>
                     )}
-                </AnimatePresence>
+                </>
             )}
-            {/* Navigation */}
-            <nav className="navbar">
-                <div className="logo">
-                    <img src="/logo-circle-blue.svg" alt="Logo" style={{ height: '35px', marginRight: '10px', verticalAlign: 'middle' }} />
-                    Kone Lab
-                </div>
-
-                <div className="mobile-menu-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                    {isMenuOpen ? <FaTimes /> : <FaBars />}
-                </div>
-
-                <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-                    <a href={((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/docs?category=lab"} target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)}>Docs</a>
-                    <a href="#/anim-studio" onClick={() => setIsMenuOpen(false)}>Anim Studio</a>
-                    <div className="action-buttons">
-                        <a href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001/login' : 'https://consult.koneacademy.io/login'} className="btn-login" onClick={() => setIsMenuOpen(false)}>Login</a>
-                        <a href={(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:5173/' : 'https://www.koneacademy.io/'} className="btn-hub" onClick={() => setIsMenuOpen(false)}>Back to Hub</a>
-                    </div>
-                </div>
-            </nav>
-
-            {/* Hero Section */}
-            <header className="hero">
-                <div className="hero-container">
-                    <div className="hero-text-side">
-                        <motion.h1 
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6 }}
-                            className="hero-title"
-                        >
-                            BUILD THE <br /> <span className="text-gradient">PHYSICAL WORLD</span>
-                        </motion.h1>
-                        <motion.p 
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            className="hero-subtitle"
-                        >
-                            Advanced engineering & hardware prototyping division.<br />
-                            <span className="text-white">Engineer the future the right way.</span>
-                        </motion.p>
-                        <motion.div 
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.4 }}
-                            className="hero-ctas"
-                            style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}
-                        >
-                            <button className="btn btn-primary btn-large" onClick={handleEnterWorkshop}>
-                                ENTER WORKSHOP
-                            </button>
-                            <a 
-                                href={((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/training?category=lab"}
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="btn btn-secondary-outline btn-large"
-                                style={{ 
-                                    textDecoration: 'none', 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'center' 
-                                }}
-                            >
-                                TRAINING HUB
-                            </a>
-                        </motion.div>
-                    </div>
-                    <div className="hero-animation">
-                        <LabHero3D />
-                    </div>
-                </div>
-            </header>
-
-            {/* Footer */}
-            <footer className="footer">
-                <p>&copy; {new Date().getFullYear()} Kone Lab Division. All Rights Reserved.</p>
-                <p className="footer-sub">Hardware Engineering Branch of Kone Academy</p>
-                <div className="social-icons" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
-                    <a href="https://x.com/koneacademy" target="_blank" rel="noreferrer" aria-label="X"><FaXTwitter /></a>
-                    <a href="https://www.tiktok.com/@koneacademy?_r=1&_t=ZM-931L3z5lu71" target="_blank" rel="noreferrer" aria-label="TikTok"><FaTiktok /></a>
-                    <a href="https://discord.gg/Ab4SCxPgUK" target="_blank" rel="noreferrer" aria-label="Discord"><FaDiscord /></a>
-                    <a href="https://www.linkedin.com/company/konecodeacdemy/?viewAsMember=true" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
-                    <a href="https://www.facebook.com/profile.php?id=61584327765846" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebook /></a>
-                    <a href="https://www.instagram.com/koneacademy?igsh=bnlnaTZ5YmNsMXJ1&utm_source=qr" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
-                    <a href="https://join.slack.com/t/koneacademy/shared_invite/zt-3te5lrqpj-d3gixasFIoSerlBnoQ1UMg" target="_blank" rel="noreferrer" aria-label="Slack"><FaSlack /></a>
-                    <a href="https://youtube.com/@koneacademy?si=zqEGBiiu0NRdNk6p" target="_blank" rel="noreferrer" aria-label="YouTube"><FaYoutube /></a>
-                </div>
-            </footer>
-            <InstallBanner />
         </div>
     );
 }
