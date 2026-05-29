@@ -55,18 +55,20 @@
 
 .btn-hub {
     background: var(--accent-primary);
-    color: #fff;
-    border: none;
+    color: #0a0c10;
+    border: 1px solid var(--accent-primary);
     padding: 8px 16px;
     border-radius: 6px;
     text-decoration: none;
     font-size: 0.9rem;
     font-weight: 600;
-    transition: background 0.3s;
+    transition: all 0.3s;
 }
 
 .btn-hub:hover {
-    background: var(--accent-secondary);
+    background: #ffffff;
+    color: #0a0c10;
+    border-color: #ffffff;
     box-shadow: 0 0 10px rgba(88, 166, 255, 0.4);
 }
 
@@ -138,28 +140,24 @@
     margin: 0 auto;
     padding: 0 1.5rem;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 2rem;
-    text-align: center;
+    gap: 4rem;
+    text-align: left;
 }
 
 .hero-text-side {
+    flex: 1.2;
     max-width: 800px;
 }
 
 .hero-animation {
-    width: 100%;
-    max-width: 1000px;
-    height: 550px;
-}
-
-.hero-animation {
-    flex: 1;
+    flex: 0.8;
     display: flex;
     justify-content: center;
     align-items: center;
     min-width: 450px;
+    height: 550px;
 }
 
 .hero-title {
@@ -177,8 +175,15 @@
     margin-bottom: 2rem;
     line-height: 1.6;
     max-width: 600px;
-    margin-left: auto;
+    margin-left: 0;
     margin-right: auto;
+}
+
+.hero-ctas {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: flex-start;
+    margin-top: 2rem;
 }
 
 @media (max-width: 1024px) {
@@ -189,21 +194,26 @@
     .hero-container {
         flex-direction: column;
         text-align: center;
-        gap: 1.5rem;
+        gap: 2.5rem;
     }
 
-    .hero-content {
-        text-align: center;
+    .hero-text-side {
         max-width: 100%;
     }
 
-    .hero-title {
-        /* Already handled by clamp */
+    .hero-subtitle {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-ctas {
+        justify-content: center;
+        gap: 1rem;
     }
 
     .hero-animation {
         min-width: 100%;
-        height: 400px;
+        height: 450px;
     }
 
     .hero-actions {
@@ -229,17 +239,20 @@
 
 .btn-primary {
     background: var(--accent-primary);
-    color: #fff;
-    border: none;
+    color: #0a0c10;
+    border: 1px solid var(--accent-primary);
     padding: 0.8rem 2rem;
     font-size: 0.95rem;
     font-weight: 700;
     border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.2s;
 }
 
 .btn-primary:hover {
+    background: #ffffff;
+    color: #0a0c10;
+    border-color: #ffffff;
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(88, 166, 255, 0.2);
 }

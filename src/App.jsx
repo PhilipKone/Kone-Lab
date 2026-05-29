@@ -13,14 +13,8 @@ import LabHero3D from './components/LabHero3D';
 import AnimStudio from './components/AnimStudio';
 
 function App() {
-    // Synchronous state initialization to prevent first-render flashing
-    const [isInitializing, setIsInitializing] = useState(() => {
-        if (typeof window === 'undefined') return false;
-        const isSnap = navigator.userAgent.includes('ReactSnap');
-        const hasLoaded = sessionStorage.getItem('kone_lab_loaded') === 'true';
-        return !isSnap && !hasLoaded;
-    });
-    const [showLoader, setShowLoader] = useState(isInitializing);
+    const [isInitializing, setIsInitializing] = useState(false);
+    const [showLoader, setShowLoader] = useState(false);
     const { currentUser, loading } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showConstruction, setShowConstruction] = useState(false);
@@ -28,8 +22,14 @@ function App() {
     const [isAnimStudioOpen, setIsAnimStudioOpen] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
 
-    // Save session loaded state on mount
+    // Loader and session state initialization on mount
     useEffect(() => {
+        const isSnap = navigator.userAgent.includes('ReactSnap');
+        const hasLoaded = sessionStorage.getItem('kone_lab_loaded') === 'true';
+        if (!isSnap && !hasLoaded) {
+            setIsInitializing(true);
+            setShowLoader(true);
+        }
         if (typeof window !== 'undefined') {
             sessionStorage.setItem('kone_lab_loaded', 'true');
         }
@@ -145,7 +145,7 @@ function App() {
                             {/* Navigation */}
                             <nav className="navbar">
                                 <div className="logo">
-                                    <img src="/logo-circle-blue.svg" alt="Logo" style={{ height: '35px', marginRight: '10px', verticalAlign: 'middle' }} />
+                                    <img src="/logo-circle-blue.svg" alt="Logo" width="35" height="35" style={{ marginRight: '10px', verticalAlign: 'middle' }} />
                                     Kone Lab
                                 </div>
 
@@ -163,62 +163,64 @@ function App() {
                                 </div>
                             </nav>
 
-                            {/* Hero Section */}
-                            <header className="hero">
-                                <div className="hero-container">
-                                    <div className="hero-text-side">
-                                        <motion.h1 
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.6 }}
-                                            className="hero-title"
-                                        >
-                                            BUILD THE <br /> <span className="text-gradient">PHYSICAL WORLD</span>
-                                        </motion.h1>
-                                        <motion.p 
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.6, delay: 0.2 }}
-                                            className="hero-subtitle"
-                                        >
-                                            Advanced engineering & hardware prototyping division.<br />
-                                            <span className="text-white">Engineer the future the right way.</span>
-                                        </motion.p>
-                                        <motion.div 
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.6, delay: 0.4 }}
-                                            className="hero-ctas"
-                                            style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}
-                                        >
-                                            <button className="btn btn-primary btn-large" onClick={handleEnterWorkshop}>
-                                                ENTER WORKSHOP
-                                            </button>
-                                            <a 
-                                                href={((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/training?category=lab"}
-                                                target="_blank" 
-                                                rel="noopener noreferrer" 
-                                                className="btn btn-secondary-outline btn-large"
-                                                style={{ 
-                                                    textDecoration: 'none', 
-                                                    display: 'flex', 
-                                                    alignItems: 'center', 
-                                                    justifyContent: 'center' 
-                                                }}
+                            {/* Main Content Area */}
+                            <main id="main-content" style={{ flex: '1 0 auto', display: 'flex', flexDirection: 'column', width: '100%' }}>
+                                {/* Hero Section */}
+                                <header className="hero">
+                                    <div className="hero-container">
+                                        <div className="hero-text-side">
+                                            <motion.h1 
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.6 }}
+                                                className="hero-title"
                                             >
-                                                TRAINING HUB
-                                            </a>
-                                        </motion.div>
+                                                BUILD THE <br /> <span className="text-gradient">PHYSICAL WORLD</span>
+                                            </motion.h1>
+                                            <motion.p 
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.6, delay: 0.2 }}
+                                                className="hero-subtitle"
+                                            >
+                                                Advanced engineering & hardware prototyping division.<br />
+                                                <span className="text-white">Engineer the future the right way.</span>
+                                            </motion.p>
+                                            <motion.div 
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.6, delay: 0.4 }}
+                                                className="hero-ctas"
+                                            >
+                                                <button className="btn btn-primary btn-large" onClick={handleEnterWorkshop}>
+                                                    ENTER WORKSHOP
+                                                </button>
+                                                <a 
+                                                    href={((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !navigator.userAgent.includes('ReactSnap') ? 'http://localhost:3001' : 'https://consult.koneacademy.io') + "/training?category=lab"}
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer" 
+                                                    className="btn btn-secondary-outline btn-large"
+                                                    style={{ 
+                                                        textDecoration: 'none', 
+                                                        display: 'flex', 
+                                                        alignItems: 'center', 
+                                                        justifyContent: 'center' 
+                                                    }}
+                                                >
+                                                    TRAINING HUB
+                                                </a>
+                                            </motion.div>
+                                        </div>
+                                        <div className="hero-animation">
+                                            <LabHero3D />
+                                        </div>
                                     </div>
-                                    <div className="hero-animation">
-                                        <LabHero3D />
-                                    </div>
-                                </div>
-                            </header>
+                                </header>
+                            </main>
 
                             {/* Footer */}
                             <footer className="footer">
-                                <p>&copy; {new Date().getFullYear()} Kone Lab Division. All Rights Reserved.</p>
+                                <p suppressHydrationWarning>&copy; {new Date().getFullYear()} Kone Lab Division. All Rights Reserved.</p>
                                 <p className="footer-sub">Hardware Engineering Branch of Kone Academy</p>
                                 <div className="social-icons" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
                                     <a href="https://x.com/koneacademy" target="_blank" rel="noreferrer" aria-label="X"><FaXTwitter /></a>
