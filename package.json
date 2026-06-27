@@ -48,6 +48,7 @@
     "overrides":  {
                       "react-snap":  {
                                          "puppeteer":  "^22.0.0"
-                                     }
+                                     },
+                      "protobufjs": "^7.5.8"
                   }
 }

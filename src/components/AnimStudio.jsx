@@ -24,21 +24,24 @@ const AnimStudio = ({ onBack }) => {
     }, []);
 
     const handleDownload = (platform) => {
+        setDownloading(platform);
         const link = DOWNLOAD_LINKS[platform];
         if (link) {
-            // Use a clean, direct approach for naming
-            const downloadName = platform === 'windows' ? 'Anim-Studio-Setup.msi' : `Anim-Studio-${platform}.zip`;
-            const a = document.createElement('a');
-            a.href = link;
-            a.setAttribute('download', downloadName);
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
+            // Unify under active loading verification states
             setTimeout(() => {
-                document.body.removeChild(a);
-            }, 100);
+                setDownloading(null);
+                const downloadName = platform === 'windows' ? 'Anim-Studio-Setup.msi' : `Anim-Studio-${platform}.zip`;
+                const a = document.createElement('a');
+                a.href = link;
+                a.setAttribute('download', downloadName);
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                }, 100);
+            }, 1500);
         } else {
-            setDownloading(platform);
             setTimeout(() => setDownloading(null), 3000);
         }
     };
@@ -102,10 +105,8 @@ const AnimStudio = ({ onBack }) => {
                             download="Anim-Studio-Setup.msi"
                             className={`btn-download primary ${downloading === 'windows' ? 'loading' : ''} text-decoration-none`}
                             onClick={(e) => {
-                                if (!DOWNLOAD_LINKS.windows) {
-                                    e.preventDefault();
-                                    handleDownload('windows');
-                                }
+                                e.preventDefault();
+                                handleDownload('windows');
                             }}
                         >
                             {downloading === 'windows' ? (

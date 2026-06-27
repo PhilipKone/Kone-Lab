@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaCube, FaTools, FaCogs, FaMicrochip, FaTimes, FaSave, FaPlay, FaQuestionCircle, FaExternalLinkAlt, FaBook, FaCommentAlt, FaLink, FaTrashAlt, FaStore, FaLock, FaCheckCircle, FaTv } from 'react-icons/fa';
+import { FaCube, FaTools, FaCogs, FaMicrochip, FaTimes, FaSave, FaPlay, FaQuestionCircle, FaExternalLinkAlt, FaBook, FaCommentAlt, FaLink, FaTrashAlt, FaStore, FaLock, FaCheckCircle, FaTv, FaCompass, FaPause } from 'react-icons/fa';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { logActivity } from '../firebase/utils';
@@ -592,8 +592,30 @@ const WorkshopLayout = ({ onClose }) => {
     const [showHelp, setShowHelp] = useState(false);
     const [isTourOpen, setIsTourOpen] = useState(false);
     const [isIdle, setIsIdle] = useState(false);
-    const [components, setComponents] = useState([]);
-    const [connections, setConnections] = useState([]);
+    const [components, setComponents] = useState(() => {
+        const saved = localStorage.getItem('kone_lab_workshop_state');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                return parsed.components || [];
+            } catch (e) {
+                console.error("Error loading components", e);
+            }
+        }
+        return [];
+    });
+    const [connections, setConnections] = useState(() => {
+        const saved = localStorage.getItem('kone_lab_workshop_state');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                return parsed.connections || [];
+            } catch (e) {
+                console.error("Error loading connections", e);
+            }
+        }
+        return [];
+    });
     const [selectedId, setSelectedId] = useState(null);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const [sensorData, setSensorData] = useState({ acceleration: { x: 0, y: 0, z: 0 }, rotation: { alpha: 0, beta: 0, gamma: 0 } });
@@ -602,6 +624,7 @@ const WorkshopLayout = ({ onClose }) => {
     const [isWiringMode, setIsWiringMode] = useState(false);
     const [activeWiringSource, setActiveWiringSource] = useState(null);
     const [wireColor, setWireColor] = useState('#ff3333');
+    const [saveSuccess, setSaveSuccess] = useState(false);
 
     // Marketplace & Dynamic Inventory States
     const [isMarketplaceOpen, setIsMarketplaceOpen] = useState(false);
@@ -758,6 +781,17 @@ const WorkshopLayout = ({ onClose }) => {
         setConnections(connections.filter(c => c.id !== connId));
     };
 
+    const handleSave = () => {
+        try {
+            localStorage.setItem('kone_lab_workshop_state', JSON.stringify({ components, connections }));
+            setSaveSuccess(true);
+            logActivity(currentUser, 'Workshop Saved', { componentCount: components.length, wireCount: connections.length });
+            setTimeout(() => setSaveSuccess(false), 1500);
+        } catch (e) {
+            console.error("Failed to save workshop state", e);
+        }
+    };
+
     const selectedComponent = components.find(c => c.id === selectedId);
 
     // Close help popover
@@ -888,21 +922,46 @@ const WorkshopLayout = ({ onClose }) => {
                         className="control-btn store-btn" 
                         onClick={() => setIsMarketplaceOpen(true)}
                         title="Browse & unlock photorealistic 3D hardware"
-                        style={{ border: '1px solid rgba(188, 140, 255, 0.4)' }}
                     >
                         <FaStore style={{ color: '#bc8cff' }} /> Component Marketplace
                     </button>
                     
                     <button className="control-btn" onClick={() => setIsTourOpen(true)} title="Quick Start Tour">
-                        <FaTools /> Tour
+                        <FaCompass /> Tour
                     </button>
-                    <button className="control-btn"><FaSave /> Save</button>
                     <button 
-                        className="control-btn accent" 
-                        title="Simulate Workshop"
-                        onClick={() => logActivity(currentUser, 'Simulation Started', { componentCount: components.length, wireCount: connections.length })}
+                        className={`control-btn ${saveSuccess ? 'save-success' : ''}`}
+                        onClick={handleSave}
+                        title="Save current workshop design to browser"
                     >
-                        <FaPlay /> Simulate
+                        {saveSuccess ? (
+                            <>
+                                <FaCheckCircle style={{ color: '#3fb950' }} /> Saved!
+                            </>
+                        ) : (
+                            <>
+                                <FaSave /> Save
+                            </>
+                        )}
+                    </button>
+                    <button 
+                        className={`control-btn ${!isIdle ? 'accent simulation-active' : ''}`} 
+                        title={isIdle ? "Start hardware simulation" : "Pause hardware simulation"}
+                        onClick={() => {
+                            const nextIdle = !isIdle;
+                            setIsIdle(nextIdle);
+                            logActivity(currentUser, nextIdle ? 'Simulation Paused' : 'Simulation Started', { componentCount: components.length, wireCount: connections.length });
+                        }}
+                    >
+                        {isIdle ? (
+                            <>
+                                <FaPlay /> Simulate
+                            </>
+                        ) : (
+                            <>
+                                <FaPause /> Pause
+                            </>
+                        )}
                     </button>
                     
                     <div className="help-menu-container" ref={helpRef}>
@@ -984,20 +1043,10 @@ const WorkshopLayout = ({ onClose }) => {
                     <div style={{ marginBottom: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', position: 'relative', zIndex: 1005 }}>
                         <input 
                             type="text" 
-                            className="form-control-dark"
+                            className="form-control-dark drawer-search-input"
                             placeholder="🔍 Search 1000+ components..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{
-                                width: '100%',
-                                background: '#0d1117',
-                                border: '1px solid #30363d',
-                                borderRadius: '6px',
-                                padding: '0.5rem 0.75rem',
-                                color: '#c9d1d9',
-                                fontSize: '0.8rem',
-                                outline: 'none'
-                            }}
                         />
                         <CustomDropdown
                             value={selectedSidebarCategory}
@@ -1163,10 +1212,6 @@ const WorkshopLayout = ({ onClose }) => {
                                         <select 
                                             value={selectedComponent.color || 'red'} 
                                             onChange={(e) => updateComponent(selectedId, { color: e.target.value })}
-                                            style={{
-                                                width: '100%', background: '#161b22', border: '1px solid #30363d',
-                                                color: 'white', padding: '0.6rem', borderRadius: '6px', fontSize: '0.85rem'
-                                            }}
                                         >
                                             <option value="red">Red</option>
                                             <option value="green">Green</option>
@@ -1283,7 +1328,7 @@ const WorkshopLayout = ({ onClose }) => {
                                 ))}
                             </div>
                         ) : (
-                            <p className="no-selection">No wires connected. Click "3D Wire Tool" to start wiring!</p>
+                            <p className="no-selection">No wires connected. Click &quot;3D Wire Tool&quot; to start wiring!</p>
                         )}
                     </div>
                 </aside>

@@ -10,9 +10,7 @@ export const getNormalizedComponentInfo = (component) => {
     const lowerName = name.toLowerCase();
     
     let baseType = type;
-    let pinCount = 8;
     let label = name || type;
-    let color = component.color || 'red';
     
     if (type === 'resistor' || type.startsWith('resistor_var_') || type.startsWith('resistor_auto_')) {
         return { baseType: 'resistor', label, pinCount: 2 };
@@ -1682,6 +1680,7 @@ const PowerComponent = ({ compId, type, position, scale, selected, onClick, isWi
 
 // Premium Procedural 3D model for breakout boards, actuators, and generic modules
 const GenericModuleComponent = ({ compId, type, name, position, scale, selected, onClick, isWiringMode, onPinClick, activeWiringSource }) => {
+    const [hoveredPin, setHoveredPin] = useState(null);
     let pins = [];
     if (type === 'pico') pins = ['3V3', 'GND', 'GP2', 'GP3', 'VSYS'];
     else if (type === 'relay') pins = ['VCC', 'GND', 'SIG'];
@@ -1919,7 +1918,6 @@ const GenericModuleComponent = ({ compId, type, name, position, scale, selected,
         );
     } else if (type === 'breadboard_mini') {
         const miniGridCols = 15;
-        const [hoveredPin, setHoveredPin] = useState(null);
 
         const getHighlightParams = (pin) => {
             if (!pin) return null;
@@ -2177,29 +2175,63 @@ const PlacedComponent = ({ comp, selected, onClick, onUpdate, isWiringMode, onPi
 // Procedural Curved 3D Wire with Moving Glowing Signal Pulse
 const CurvedWire = ({ fromPos, toPos, color = "#ff3333", isPaused = false }) => {
     const pulseRef = useRef();
+    const tubeRef = useRef();
 
     const pStart = new THREE.Vector3(...fromPos);
     const pEnd = new THREE.Vector3(...toPos);
+    
+    // 1. Calculate dynamic sag factor based on connection distance
+    const distance = pStart.distanceTo(pEnd);
+    const sag = Math.min(1.5, 0.15 + distance * 0.2);
 
-    const midX = (pStart.x + pEnd.x) / 2;
-    const midY = Math.max(pStart.y, pEnd.y) + 0.6;
-    const midZ = (pStart.z + pEnd.z) / 2;
-    const pMid = new THREE.Vector3(midX, midY, midZ);
+    // 2. Define the 5 curve points for vertical entry and draped hang
+    const v1 = pStart;
+    const v2 = pStart.clone().add(new THREE.Vector3(0, 0.45, 0)); // Exits starting pin straight up
+    const v5 = pEnd;
+    const v4 = pEnd.clone().add(new THREE.Vector3(0, 0.45, 0)); // Enters destination pin straight down
 
-    const curve = new THREE.QuadraticBezierCurve3(pStart, pMid, pEnd);
+    const midX = (v1.x + v5.x) / 2;
+    const midY = Math.max(v1.y, v5.y) + 0.35 - sag;
+    const midZ = (v1.z + v5.z) / 2;
+
+    const baseCurve = new THREE.CatmullRomCurve3([
+        v1,
+        v2,
+        new THREE.Vector3(midX, midY, midZ),
+        v4,
+        v5
+    ]);
 
     useFrame((state) => {
+        const time = state.clock.getElapsedTime();
+        const seed = fromPos[0] + fromPos[2] + toPos[0]; // Unique seed based on coordinates
+
+        // 3. Compute organic real-time sway
+        const swayX = Math.sin(time * 1.5 + seed) * 0.025;
+        const swayZ = Math.cos(time * 1.2 + seed) * 0.025;
+
+        const currentV3 = new THREE.Vector3(midX + swayX, midY, midZ + swayZ);
+        const activeCurve = new THREE.CatmullRomCurve3([v1, v2, currentV3, v4, v5]);
+
+        // 4. Directly update WebGL geometry buffer bypassing React (smooth 60fps)
+        if (tubeRef.current) {
+            // Dispose of old geometry memory to prevent GPU memory leaks
+            tubeRef.current.geometry.dispose();
+            tubeRef.current.geometry = new THREE.TubeGeometry(activeCurve, 32, 0.03, 8, false);
+        }
+
+        // 5. Align pulse sphere to the active swaying spline path
         if (pulseRef.current && !isPaused) {
-            const t = (state.clock.getElapsedTime() * 0.35) % 1;
-            const pos = curve.getPointAt(t);
+            const pulseT = (time * 0.35) % 1;
+            const pos = activeCurve.getPointAt(pulseT);
             pulseRef.current.position.copy(pos);
         }
     });
 
     return (
         <group>
-            <mesh castShadow receiveShadow>
-                <tubeGeometry args={[curve, 32, 0.03, 8, false]} />
+            <mesh ref={tubeRef} castShadow receiveShadow>
+                <tubeGeometry args={[baseCurve, 32, 0.03, 8, false]} />
                 <meshStandardMaterial color={color} roughness={0.4} metalness={0.3} />
             </mesh>
 
