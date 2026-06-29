@@ -35,6 +35,52 @@ function App() {
         }
     }, []);
 
+    // Inject Structured Data for Kone Lab (Top 1% SEO Practice)
+    useEffect(() => {
+        const SCHEMA_SCRIPT_ID = 'seo-lab-jsonld';
+        let schemaScript = document.getElementById(SCHEMA_SCRIPT_ID);
+        if (schemaScript) {
+            schemaScript.remove();
+        }
+
+        const schemaData = [
+            {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "Kone Lab | Hardware Engineering & Prototyping",
+                "url": "https://lab.koneacademy.io/",
+                "parentOrganization": {
+                    "@type": "Organization",
+                    "name": "Kone Academy",
+                    "url": "https://www.koneacademy.io/"
+                }
+            },
+            {
+                "@context": "https://schema.org",
+                "@type": "EducationalOrganization",
+                "name": "Kone Lab Academy",
+                "description": "State-of-the-art virtual and physical engineering lab teaching microcontrollers, IoT telemetry, circuit design, and robotics.",
+                "url": "https://lab.koneacademy.io/",
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Accra",
+                    "addressCountry": "GH"
+                }
+            }
+        ];
+
+        schemaScript = document.createElement('script');
+        schemaScript.id = SCHEMA_SCRIPT_ID;
+        schemaScript.setAttribute('type', 'application/ld+json');
+        schemaScript.innerHTML = JSON.stringify(schemaData);
+        document.head.appendChild(schemaScript);
+
+        return () => {
+            const scriptToRemove = document.getElementById(SCHEMA_SCRIPT_ID);
+            if (scriptToRemove) scriptToRemove.remove();
+        };
+    }, []);
+
     // Initial check on mount
     useEffect(() => {
         const handleHashChange = () => {
