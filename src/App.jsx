@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
-import { FaBars, FaTimes, FaCogs, FaMicrochip, FaCube, FaTools, FaGithub, FaDiscord, FaLinkedin, FaFacebook, FaInstagram, FaSlack, FaYoutube, FaTiktok } from 'react-icons/fa';
+import { FaBars, FaTimes, FaCogs, FaMicrochip, FaCube, FaTools, FaGithub, FaDiscord, FaLinkedin, FaFacebook, FaInstagram, FaSlack, FaYoutube, FaTiktok, FaWhatsapp } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import WorkshopLayout from './components/WorkshopLayout';
 import AuthInterceptModal from './components/AuthInterceptModal';
@@ -282,6 +282,7 @@ function App() {
                                 <div className="social-icons" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
                                     <a href="https://x.com/koneacademy" target="_blank" rel="noreferrer" aria-label="X"><FaXTwitter /></a>
                                     <a href="https://www.tiktok.com/@koneacademy?_r=1&_t=ZM-931L3z5lu71" target="_blank" rel="noreferrer" aria-label="TikTok"><FaTiktok /></a>
+                                    <a href="https://whatsapp.com/channel/0029VbDGmjg1dAvyZSw2MJ30" target="_blank" rel="noreferrer" aria-label="WhatsApp"><FaWhatsapp /></a>
                                     <a href="https://discord.gg/Ab4SCxPgUK" target="_blank" rel="noreferrer" aria-label="Discord"><FaDiscord /></a>
                                     <a href="https://www.linkedin.com/showcase/konelab/about/?viewAsMember=true" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
                                     <a href="https://www.facebook.com/profile.php?id=61584327765846" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebook /></a>
