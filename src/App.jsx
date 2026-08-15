@@ -191,11 +191,11 @@ function App() {
                             {/* Navigation */}
                             <nav className="navbar">
                                 <div className="logo">
-                                    <img src="/logo-circle-blue.svg" alt="Logo" width="35" height="35" style={{ marginRight: '10px', verticalAlign: 'middle' }} />
+                                    <img src="/logo-circle-blue.svg" alt="Kone Lab Logo" width="35" height="35" style={{ marginRight: '10px', verticalAlign: 'middle' }} />
                                     Kone Lab
                                 </div>
 
-                                <div className="mobile-menu-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                                <div className="mobile-menu-toggle" role="button" aria-label="Toggle navigation menu" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                                     {isMenuOpen ? <FaTimes /> : <FaBars />}
                                 </div>
 
