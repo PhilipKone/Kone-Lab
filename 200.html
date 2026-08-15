@@ -29,7 +29,50 @@
     <meta name="twitter:description" content="Hands-on training in Microcontrollers, PCB Design, and Internet of Things. Build the physical world." />
     <meta name="twitter:image" content="https://lab.koneacademy.io/og-image.png?v=4" />
 
-    <title>Kone Lab</title>
+    <link rel="help" type="text/markdown" href="/llms.txt" title="LLMs Text File" />
+    <link rel="llms-txt" href="/llms.txt" />
+    <title>Kone Lab | Hardware Engineering & Robotics</title>
+
+    <!-- WebMCP Declarations for Autonomous Agentic Browsing -->
+    <script type="application/webmcp+json">
+    {
+      "version": "1.0",
+      "name": "Kone Lab Portal",
+      "description": "Agent tools for hardware engineering, microcontroller simulators, and IoT prototyping",
+      "tools": [
+        {
+          "name": "enroll_hardware_lab",
+          "description": "Register for hardware prototyping, PCB design, and embedded IoT masterclasses",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "track": { 
+                "type": "string", 
+                "enum": ["Embedded Systems & IoT", "Arduino & Microcontrollers", "PCB Design", "3D CAD & Prototyping"] 
+              },
+              "studentEmail": { "type": "string", "format": "email" }
+            },
+            "required": ["track", "studentEmail"]
+          }
+        },
+        {
+          "name": "navigate_lab_mode",
+          "description": "Switch between hardware workbench, 3D design studio, and telemetry dashboard",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "mode": { 
+                "type": "string", 
+                "enum": ["arduino", "3d-design", "portfolio", "curriculum"] 
+              }
+            },
+            "required": ["mode"]
+          }
+        }
+      ]
+    }
+    </script>
+
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -146,8 +189,8 @@
         }
       }
     </script>
-  <script type="module" crossorigin src="/assets/index-BVSfP603.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-CNLIqekd.css">
+  <script type="module" crossorigin src="/assets/index-DTXUSCt9.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-4iahWS0y.css">
 </head>
 
 <body>

@@ -1,0 +1,16 @@
+# Kone Lab
+
+> Hardware Engineering, Robotics, Embedded Systems, and IoT Prototyping by Kone Academy.
+
+Kone Lab focuses on the physical computing world: microcontrollers (ESP32, Arduino, ARM Cortex), printed circuit board (PCB) design, telemetry sensors, and 3D modeling.
+
+## Core Capabilities & Tracks
+
+- [Arduino & Microcontroller Simulator](https://lab.koneacademy.io/#/arduino) - Virtual circuit breadboards, firmware debugging, and peripheral testing.
+- [3D Design & Modeling (Anim Studio)](https://lab.koneacademy.io/#/3d-design) - Three.js WebGL spatial viewer, CAD models, and rapid prototyping.
+- [Embedded Systems & IoT Engineering](https://lab.koneacademy.io/) - Sensor integration, MQTT telemetry, automation robotics, and firmware architecture.
+- [Hardware Portfolio](https://lab.koneacademy.io/#/portfolio) - Showcase of physical IoT devices, PCB schematics, and automated builds.
+
+## Parent Ecosystem
+
+- [Kone Academy Main Hub](https://www.koneacademy.io/) - Multidisciplinary innovation and technology collective.
