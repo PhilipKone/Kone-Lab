@@ -25,6 +25,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "start_url": "/",
@@ -47,7 +53,7 @@
     },
     {
       "name": "Documentation",
-      "url": "https://consult.koneacademy.io/#/docs?category=lab",
+      "url": "https://consult.codkon.com/#/docs?category=lab",
       "description": "View Lab hardware documentation",
       "icons": [
         {

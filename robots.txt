@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://lab.koneacademy.io/sitemap.xml
+Sitemap: https://lab.codkon.com/sitemap.xml
